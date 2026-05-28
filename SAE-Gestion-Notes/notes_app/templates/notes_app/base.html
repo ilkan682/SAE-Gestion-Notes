@@ -1,0 +1,536 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>{% block titre %}GestionNotes{% endblock %} – SAÉ IUT</title>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=DM+Sans:ital,wght@0,300;0,400;0,500;0,600;1,400&family=DM+Mono:wght@400;500&display=swap');
+
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --bleu:      #1a4e8a;
+      --bleu-clair:#2d6cc0;
+      --bleu-pale: #e8f0fb;
+      --vert:      #1a7a4a;
+      --vert-pale: #e6f4ec;
+      --rouge:     #c0392b;
+      --rouge-pale:#fdecea;
+      --orange:    #c0710a;
+      --orange-pale:#fef3e2;
+      --gris-1:    #f4f5f7;
+      --gris-2:    #e9eaed;
+      --gris-3:    #c1c5cc;
+      --gris-5:    #6b7280;
+      --gris-7:    #374151;
+      --gris-9:    #111827;
+      --sidebar-w: 240px;
+      --radius:    8px;
+      --radius-lg: 12px;
+      --font:      'DM Sans', system-ui, sans-serif;
+      --font-mono: 'DM Mono', monospace;
+    }
+
+    body {
+      font-family: var(--font);
+      background: var(--gris-1);
+      color: var(--gris-9);
+      display: flex;
+      min-height: 100vh;
+    }
+
+    /* ── SIDEBAR ── */
+    .sidebar {
+      width: var(--sidebar-w);
+      background: var(--gris-9);
+      color: #fff;
+      display: flex;
+      flex-direction: column;
+      position: fixed;
+      top: 0; left: 0; bottom: 0;
+      z-index: 100;
+      overflow-y: auto;
+    }
+
+    .sidebar-brand {
+      padding: 1.5rem 1.25rem 1rem;
+      border-bottom: 1px solid rgba(255,255,255,.08);
+    }
+    .sidebar-brand .logo {
+      font-size: 1.1rem;
+      font-weight: 600;
+      color: #fff;
+      text-decoration: none;
+      display: flex;
+      align-items: center;
+      gap: .5rem;
+    }
+    .sidebar-brand .logo span {
+      background: var(--bleu-clair);
+      color: #fff;
+      border-radius: 6px;
+      padding: 3px 8px;
+      font-size: .7rem;
+      font-weight: 500;
+      letter-spacing: .05em;
+    }
+    .sidebar-brand .subtitle {
+      font-size: .72rem;
+      color: rgba(255,255,255,.4);
+      margin-top: .25rem;
+      padding-left: 2px;
+    }
+
+    .nav-section {
+      padding: .75rem 0 .25rem;
+    }
+    .nav-section-label {
+      font-size: .65rem;
+      font-weight: 600;
+      letter-spacing: .1em;
+      text-transform: uppercase;
+      color: rgba(255,255,255,.3);
+      padding: 0 1.25rem .4rem;
+    }
+
+    .nav-link {
+      display: flex;
+      align-items: center;
+      gap: .6rem;
+      padding: .55rem 1.25rem;
+      color: rgba(255,255,255,.7);
+      text-decoration: none;
+      font-size: .875rem;
+      border-left: 3px solid transparent;
+      transition: all .15s;
+    }
+    .nav-link:hover {
+      color: #fff;
+      background: rgba(255,255,255,.05);
+    }
+    .nav-link.active {
+      color: #fff;
+      background: rgba(45,108,192,.3);
+      border-left-color: var(--bleu-clair);
+    }
+    .nav-link .icon {
+      width: 18px;
+      height: 18px;
+      opacity: .7;
+      flex-shrink: 0;
+    }
+    .nav-link.active .icon { opacity: 1; }
+
+    .nav-badge {
+      margin-left: auto;
+      background: var(--bleu-clair);
+      color: #fff;
+      border-radius: 10px;
+      font-size: .65rem;
+      padding: 1px 7px;
+      font-weight: 500;
+    }
+
+    .sidebar-footer {
+      margin-top: auto;
+      padding: 1rem 1.25rem;
+      border-top: 1px solid rgba(255,255,255,.08);
+      font-size: .72rem;
+      color: rgba(255,255,255,.25);
+    }
+
+    /* ── MAIN ── */
+    .main {
+      margin-left: var(--sidebar-w);
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      min-height: 100vh;
+    }
+
+    .topbar {
+      background: #fff;
+      border-bottom: 1px solid var(--gris-2);
+      padding: .85rem 2rem;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      position: sticky;
+      top: 0;
+      z-index: 50;
+    }
+    .topbar-title {
+      font-size: 1rem;
+      font-weight: 600;
+      color: var(--gris-9);
+    }
+    .topbar-breadcrumb {
+      font-size: .8rem;
+      color: var(--gris-5);
+      display: flex;
+      align-items: center;
+      gap: .4rem;
+      margin-top: .15rem;
+    }
+    .topbar-breadcrumb a { color: var(--bleu-clair); text-decoration: none; }
+
+    .content {
+      padding: 2rem;
+      flex: 1;
+    }
+
+    /* ── MESSAGES DJANGO ── */
+    .messages-container { margin-bottom: 1.5rem; }
+    .alert {
+      display: flex;
+      align-items: center;
+      gap: .75rem;
+      padding: .85rem 1rem;
+      border-radius: var(--radius);
+      font-size: .875rem;
+      font-weight: 500;
+      margin-bottom: .5rem;
+    }
+    .alert-success { background: var(--vert-pale); color: var(--vert); border: 1px solid #a7d9bc; }
+    .alert-danger  { background: var(--rouge-pale); color: var(--rouge); border: 1px solid #f5b8b3; }
+    .alert-warning { background: var(--orange-pale); color: var(--orange); border: 1px solid #f8d499; }
+    .alert-info    { background: var(--bleu-pale); color: var(--bleu); border: 1px solid #a8c8f0; }
+
+    /* ── CARDS ── */
+    .card {
+      background: #fff;
+      border: 1px solid var(--gris-2);
+      border-radius: var(--radius-lg);
+      overflow: hidden;
+    }
+    .card-header {
+      padding: 1.1rem 1.5rem;
+      border-bottom: 1px solid var(--gris-2);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 1rem;
+    }
+    .card-title {
+      font-size: 1rem;
+      font-weight: 600;
+      color: var(--gris-9);
+    }
+    .card-body { padding: 1.5rem; }
+
+    /* ── TABLEAU ── */
+    .table-wrapper { overflow-x: auto; }
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: .875rem;
+    }
+    thead th {
+      background: var(--gris-1);
+      color: var(--gris-5);
+      font-weight: 600;
+      font-size: .75rem;
+      text-transform: uppercase;
+      letter-spacing: .05em;
+      padding: .75rem 1rem;
+      text-align: left;
+      border-bottom: 1px solid var(--gris-2);
+    }
+    tbody td {
+      padding: .85rem 1rem;
+      border-bottom: 1px solid var(--gris-2);
+      color: var(--gris-7);
+      vertical-align: middle;
+    }
+    tbody tr:last-child td { border-bottom: none; }
+    tbody tr:hover { background: var(--gris-1); }
+
+    /* Avatar initiales */
+    .avatar {
+      width: 36px; height: 36px;
+      border-radius: 50%;
+      background: var(--bleu-pale);
+      color: var(--bleu);
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: 600;
+      font-size: .75rem;
+      font-family: var(--font-mono);
+      flex-shrink: 0;
+    }
+    .avatar-sm { width: 28px; height: 28px; font-size: .65rem; }
+
+    .cell-etudiant { display: flex; align-items: center; gap: .75rem; }
+    .cell-num { font-family: var(--font-mono); font-size: .8rem; color: var(--gris-5); }
+
+    /* ── BADGES ── */
+    .badge {
+      display: inline-block;
+      padding: 3px 10px;
+      border-radius: 20px;
+      font-size: .72rem;
+      font-weight: 600;
+    }
+    .badge-bleu    { background: var(--bleu-pale); color: var(--bleu); }
+    .badge-vert    { background: var(--vert-pale); color: var(--vert); }
+    .badge-gris    { background: var(--gris-2); color: var(--gris-5); }
+
+    /* ── BOUTONS ── */
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      gap: .4rem;
+      padding: .5rem 1.1rem;
+      border-radius: var(--radius);
+      font-family: var(--font);
+      font-size: .875rem;
+      font-weight: 500;
+      cursor: pointer;
+      text-decoration: none;
+      border: 1px solid transparent;
+      transition: all .15s;
+    }
+    .btn-primary   { background: var(--bleu-clair); color: #fff; border-color: var(--bleu-clair); }
+    .btn-primary:hover { background: var(--bleu); border-color: var(--bleu); }
+    .btn-outline   { background: #fff; color: var(--gris-7); border-color: var(--gris-3); }
+    .btn-outline:hover { border-color: var(--gris-5); }
+    .btn-danger    { background: var(--rouge); color: #fff; border-color: var(--rouge); }
+    .btn-danger:hover { background: #a93226; }
+    .btn-sm { padding: .3rem .7rem; font-size: .8rem; }
+    .btn-icon { width: 30px; height: 30px; padding: 0; justify-content: center; }
+
+    /* ── FORMULAIRES ── */
+    .form-group { margin-bottom: 1.25rem; }
+    label {
+      display: block;
+      font-size: .8rem;
+      font-weight: 500;
+      color: var(--gris-7);
+      margin-bottom: .4rem;
+    }
+    .form-control, .form-select {
+      width: 100%;
+      padding: .55rem .85rem;
+      border: 1px solid var(--gris-3);
+      border-radius: var(--radius);
+      font-family: var(--font);
+      font-size: .875rem;
+      color: var(--gris-9);
+      background: #fff;
+      transition: border-color .15s, box-shadow .15s;
+    }
+    .form-control:focus, .form-select:focus {
+      outline: none;
+      border-color: var(--bleu-clair);
+      box-shadow: 0 0 0 3px rgba(45,108,192,.15);
+    }
+    .form-control.is-invalid { border-color: var(--rouge); }
+    .invalid-feedback { color: var(--rouge); font-size: .78rem; margin-top: .3rem; }
+    .form-text { font-size: .78rem; color: var(--gris-5); margin-top: .3rem; }
+
+    .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; }
+
+    /* ── SEARCH BAR ── */
+    .search-bar {
+      display: flex;
+      align-items: center;
+      gap: .5rem;
+      background: var(--gris-1);
+      border: 1px solid var(--gris-2);
+      border-radius: var(--radius);
+      padding: .4rem .75rem;
+    }
+    .search-bar input {
+      border: none;
+      background: transparent;
+      font-family: var(--font);
+      font-size: .875rem;
+      color: var(--gris-9);
+      outline: none;
+      width: 220px;
+    }
+
+    /* ── PAGE VIDE ── */
+    .empty-state {
+      text-align: center;
+      padding: 4rem 2rem;
+      color: var(--gris-5);
+    }
+    .empty-state svg { opacity: .3; margin-bottom: 1rem; }
+    .empty-state p { font-size: .9rem; }
+
+    /* ── STAT CARDS ── */
+    .stats-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+      gap: 1rem;
+      margin-bottom: 2rem;
+    }
+    .stat-card {
+      background: #fff;
+      border: 1px solid var(--gris-2);
+      border-radius: var(--radius-lg);
+      padding: 1.25rem;
+    }
+    .stat-label { font-size: .75rem; font-weight: 600; color: var(--gris-5); text-transform: uppercase; letter-spacing: .05em; margin-bottom: .5rem; }
+    .stat-value { font-size: 2rem; font-weight: 600; color: var(--gris-9); line-height: 1; }
+    .stat-icon {
+      width: 40px; height: 40px;
+      border-radius: 10px;
+      display: flex; align-items: center; justify-content: center;
+      margin-bottom: .75rem;
+    }
+    .stat-icon-bleu { background: var(--bleu-pale); color: var(--bleu-clair); }
+    .stat-icon-vert { background: var(--vert-pale); color: var(--vert); }
+    .stat-icon-orange { background: var(--orange-pale); color: var(--orange); }
+
+    /* ── CONFIRM SUPPRESSION ── */
+    .danger-zone {
+      border: 1px solid #f5b8b3;
+      border-radius: var(--radius-lg);
+      background: var(--rouge-pale);
+      padding: 1.5rem;
+    }
+
+    /* ── PHOTO ETUDIANT ── */
+    .photo-preview {
+      width: 80px; height: 80px;
+      border-radius: 50%;
+      object-fit: cover;
+      border: 3px solid var(--gris-2);
+    }
+
+    /* ── DETAIL SECTION ── */
+    .detail-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 1.5rem; }
+    .detail-item label { font-size: .75rem; color: var(--gris-5); font-weight: 600; text-transform: uppercase; letter-spacing: .05em; margin-bottom: .25rem; }
+    .detail-item p { color: var(--gris-9); font-size: .9rem; }
+
+    /* RESPONSIVE */
+    @media (max-width: 900px) {
+      .sidebar { transform: translateX(-100%); }
+      .main { margin-left: 0; }
+    }
+  </style>
+</head>
+<body>
+
+<!-- ══ SIDEBAR ══ -->
+<aside class="sidebar">
+  <div class="sidebar-brand">
+    <a href="{% url 'accueil' %}" class="logo">
+      <span>SAÉ</span> GestionNotes
+    </a>
+    <p class="subtitle">IUT – BUT Informatique</p>
+  </div>
+
+  <nav class="nav-section">
+    <p class="nav-section-label">Navigation</p>
+    <a href="{% url 'accueil' %}" class="nav-link {% if request.resolver_match.url_name == 'accueil' %}active{% endif %}">
+      <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
+      Tableau de bord
+    </a>
+  </nav>
+
+  <nav class="nav-section">
+    <p class="nav-section-label">Gestion</p>
+    <a href="{% url 'etudiant_liste' %}" class="nav-link {% if 'etudiant' in request.resolver_match.url_name %}active{% endif %}">
+      <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+      Étudiants
+    </a>
+    <a href="{% url 'enseignant_liste' %}" class="nav-link {% if 'enseignant' in request.resolver_match.url_name %}active{% endif %}">
+      <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="7" width="20" height="14" rx="2"/><path d="M16 3H8a2 2 0 0 0-2 2v2h12V5a2 2 0 0 0-2-2z"/></svg>
+      Enseignants
+    </a>
+    <a href="{% url 'ue_liste' %}" class="nav-link {% if 'ue' in request.resolver_match.url_name %}active{% endif %}">
+      <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"/><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"/></svg>
+      UE
+    </a>
+  </nav>
+
+  <nav class="nav-section">
+    <p class="nav-section-label">Pédagogie</p>
+    <a href="#" class="nav-link" title="Branche dev-hussain">
+      <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14.5 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7.5L14.5 2z"/><polyline points="14 2 14 8 20 8"/></svg>
+      Ressources
+      <span class="nav-badge">dev-2</span>
+    </a>
+    <a href="#" class="nav-link" title="Branche dev-hussain">
+      <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+      Examens
+      <span class="nav-badge">dev-2</span>
+    </a>
+    <a href="#" class="nav-link" title="Branche dev-hussain">
+      <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
+      Notes
+      <span class="nav-badge">dev-2</span>
+    </a>
+  </nav>
+
+  <nav class="nav-section">
+    <p class="nav-section-label">Import / Export</p>
+    <a href="#" class="nav-link" title="Branche dev-rafael">
+      <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
+      Import CSV
+      <span class="nav-badge">dev-3</span>
+    </a>
+    <a href="#" class="nav-link" title="Branche dev-rafael">
+      <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg>
+      Relevé de notes
+      <span class="nav-badge">dev-3</span>
+    </a>
+  </nav>
+
+  <div class="sidebar-footer">
+    Branche : <strong style="color:rgba(255,255,255,.5)">dev-ilkan</strong><br>
+    Django + MySQL · XAMPP
+  </div>
+</aside>
+
+<!-- ══ MAIN ══ -->
+<div class="main">
+
+  <!-- Topbar -->
+  <header class="topbar">
+    <div>
+      <p class="topbar-title">{% block titre_page %}GestionNotes{% endblock %}</p>
+      <div class="topbar-breadcrumb">
+        <a href="{% url 'accueil' %}">Accueil</a>
+        {% block breadcrumb %}{% endblock %}
+      </div>
+    </div>
+    <div style="display:flex;gap:.5rem;align-items:center">
+      {% block topbar_actions %}{% endblock %}
+    </div>
+  </header>
+
+  <!-- Content -->
+  <main class="content">
+
+    <!-- Messages Django -->
+    {% if messages %}
+    <div class="messages-container">
+      {% for message in messages %}
+      <div class="alert alert-{{ message.tags }}">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          {% if message.tags == 'success' %}
+          <polyline points="20 6 9 17 4 12"/>
+          {% elif message.tags == 'danger' %}
+          <circle cx="12" cy="12" r="10"/><line x1="15" y1="9" x2="9" y2="15"/><line x1="9" y1="9" x2="15" y2="15"/>
+          {% else %}
+          <circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/>
+          {% endif %}
+        </svg>
+        {{ message }}
+      </div>
+      {% endfor %}
+    </div>
+    {% endif %}
+
+    {% block content %}{% endblock %}
+  </main>
+</div>
+
+</body>
+</html>
