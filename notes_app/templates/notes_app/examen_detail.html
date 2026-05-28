@@ -1,0 +1,41 @@
+{% extends 'notes_app/base.html' %}
+
+{% block titre %}{{ examen.titre }}{% endblock %}
+{% block titre_page %}Détail de l'examen{% endblock %}
+{% block breadcrumb %}
+  <span>/</span> <a href="{% url 'examen_liste' %}">Examens</a>
+  <span>/</span> <span>{{ examen.titre }}</span>
+{% endblock %}
+
+{% block topbar_actions %}
+<a href="{% url 'examen_update' examen.pk %}" class="btn btn-outline">Modifier</a>
+<a href="{% url 'examen_delete' examen.pk %}" class="btn btn-danger">Supprimer</a>
+{% endblock %}
+
+{% block content %}
+<div class="card">
+  <div class="card-header">
+    <h2 class="card-title">{{ examen.titre }}</h2>
+  </div>
+  <div class="card-body">
+    <div class="detail-grid">
+      <div class="detail-item">
+        <label>Titre</label>
+        <p>{{ examen.titre }}</p>
+      </div>
+      <div class="detail-item">
+        <label>Date</label>
+        <p>{{ examen.date }}</p>
+      </div>
+      <div class="detail-item">
+        <label>Coefficient</label>
+        <p>{{ examen.coefficient }}</p>
+      </div>
+    </div>
+
+    <div style="margin-top:1.5rem">
+      <a href="{% url 'examen_liste' %}" class="btn btn-outline">Retour à la liste</a>
+    </div>
+  </div>
+</div>
+{% endblock %}

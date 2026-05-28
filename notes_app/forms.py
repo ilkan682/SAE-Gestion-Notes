@@ -90,3 +90,14 @@ class UEForm(forms.ModelForm):
             'semestre': 'Semestre',
             'credits_ects': 'Crédits ECTS',
         }
+class RessourceForm(forms.ModelForm):
+    class Meta:
+        model = Ressource
+        fields = ['code_ressource', 'nom', 'descriptif', 'coefficient', 'ue']
+        widgets = {
+            'code_ressource': forms.TextInput(attrs={'class': 'form-control'}),
+            'nom':            forms.TextInput(attrs={'class': 'form-control'}),
+            'descriptif':     forms.Textarea(attrs={'class': 'form-control', 'rows': 3}),
+            'coefficient':    forms.NumberInput(attrs={'class': 'form-control'}),
+            'ue':             forms.Select(attrs={'class': 'form-select'}),
+        }

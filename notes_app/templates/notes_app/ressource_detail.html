@@ -1,0 +1,50 @@
+{% extends 'notes_app/base.html' %}
+
+{% block titre %}{{ ressource.nom }}{% endblock %}
+{% block titre_page %}Détail de la ressource{% endblock %}
+{% block breadcrumb %}
+  <span>/</span> <a href="{% url 'ressource_liste' %}">Ressources</a>
+  <span>/</span> <span>{{ ressource.nom }}</span>
+{% endblock %}
+
+{% block topbar_actions %}
+<a href="{% url 'ressource_update' ressource.pk %}" class="btn btn-outline">Modifier</a>
+<a href="{% url 'ressource_delete' ressource.pk %}" class="btn btn-danger">Supprimer</a>
+{% endblock %}
+
+{% block content %}
+<div class="card">
+  <div class="card-header">
+    <h2 class="card-title">{{ ressource.nom }}</h2>
+    <span class="badge badge-bleu">{{ ressource.code_ressource }}</span>
+  </div>
+  <div class="card-body">
+    <div class="detail-grid">
+      <div class="detail-item">
+        <label>Code ressource</label>
+        <p>{{ ressource.code_ressource }}</p>
+      </div>
+      <div class="detail-item">
+        <label>Nom</label>
+        <p>{{ ressource.nom }}</p>
+      </div>
+      <div class="detail-item">
+        <label>Coefficient</label>
+        <p>{{ ressource.coefficient }}</p>
+      </div>
+      <div class="detail-item">
+        <label>UE associée</label>
+        <p>{{ ressource.ue }}</p>
+      </div>
+      <div class="detail-item" style="grid-column:1 / -1">
+        <label>Descriptif</label>
+        <p>{{ ressource.descriptif }}</p>
+      </div>
+    </div>
+
+    <div style="margin-top:1.5rem">
+      <a href="{% url 'ressource_liste' %}" class="btn btn-outline">Retour à la liste</a>
+    </div>
+  </div>
+</div>
+{% endblock %}

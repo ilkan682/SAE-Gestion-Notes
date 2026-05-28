@@ -1,0 +1,56 @@
+{% extends 'notes_app/base.html' %}
+
+{% block titre %}Examens{% endblock %}
+{% block titre_page %}Examens{% endblock %}
+{% block breadcrumb %}<span>/</span> <span>Examens</span>{% endblock %}
+
+{% block topbar_actions %}
+<a href="{% url 'examen_create' %}" class="btn btn-primary">
+  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+  Ajouter un examen
+</a>
+{% endblock %}
+
+{% block content %}
+<div class="card">
+  <div class="card-header">
+    <h2 class="card-title">Liste des examens</h2>
+  </div>
+
+  {% if examens %}
+  <div class="table-wrapper">
+    <table>
+      <thead>
+        <tr>
+          <th>Titre</th>
+          <th>Date</th>
+          <th>Coefficient</th>
+          <th>Actions</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for examen in examens %}
+        <tr>
+          <td>{{ examen.titre }}</td>
+          <td><span class="cell-num">{{ examen.date }}</span></td>
+          <td><span class="badge badge-gris">{{ examen.coefficient }}</span></td>
+          <td>
+            <div style="display:flex;gap:.4rem">
+              <a href="{% url 'examen_detail' examen.pk %}" class="btn btn-outline btn-sm">Voir</a>
+              <a href="{% url 'examen_update' examen.pk %}" class="btn btn-outline btn-sm">Modifier</a>
+              <a href="{% url 'examen_delete' examen.pk %}" class="btn btn-danger btn-sm">Supprimer</a>
+            </div>
+          </td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+  {% else %}
+  <div class="empty-state">
+    <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+    <p>Aucun examen enregistré pour le moment.</p>
+  </div>
+  {% endif %}
+</div>
+{% endblock %}

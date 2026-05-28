@@ -6,8 +6,8 @@ Responsable : Personne 1 (Ilkan) – branche dev-ilkan
 from django.shortcuts import render, get_object_or_404, redirect
 from django.contrib import messages
 from django.db.models import Q
-from .models import Etudiant, Enseignant, UE
-from .forms import EtudiantForm, EnseignantForm, UEForm
+from .models import Etudiant, Enseignant, UE,Ressource, Examen, Note
+from .forms import EtudiantForm, EnseignantForm, UEForm,RessourceForm, ExamenForm, NoteForm
 
 
 # ──────────────────────────────────────────────
@@ -300,4 +300,235 @@ def ue_supprimer(request, pk):
         'type': 'l\'UE',
         'retour_url': 'ue_liste',
         'titre_page': 'Supprimer une UE',
+    })
+# ══════════════════════════════════════════════════════
+#  CRUD – RESSOURCES   (Personne 2)
+# ══════════════════════════════════════════════════════
+
+def ressource_liste(request):
+    """Affiche la liste de toutes les ressources."""
+    ressources = Ressource.objects.all()
+    return render(request, 'notes_app/ressource_liste.html', {
+        'ressources': ressources,
+        'titre_page': 'Ressources',
+    })
+
+
+def ressource_detail(request, pk):
+    """Affiche le détail d'une ressource."""
+    ressource = get_object_or_404(Ressource, pk=pk)
+    return render(request, 'notes_app/ressource_detail.html', {
+        'ressource': ressource,
+        'titre_page': f'Ressource – {ressource.nom}',
+    })
+
+
+def ressource_creer(request):
+    """Crée une nouvelle ressource."""
+    if request.method == 'POST':
+        form = RessourceForm(request.POST)
+        if form.is_valid():
+            ressource = form.save()
+            messages.success(request, f'Ressource {ressource.nom} ajoutée.')
+            return redirect('ressource_liste')
+        else:
+            messages.error(request, 'Erreur dans le formulaire.')
+    else:
+        form = RessourceForm()
+
+    return render(request, 'notes_app/ressource_form.html', {
+        'form': form,
+        'titre_page': 'Ajouter une ressource',
+        'action': 'Ajouter',
+    })
+
+
+def ressource_modifier(request, pk):
+    """Modifie une ressource existante."""
+    ressource = get_object_or_404(Ressource, pk=pk)
+
+    if request.method == 'POST':
+        form = RessourceForm(request.POST, instance=ressource)
+        if form.is_valid():
+            form.save()
+            messages.success(request, f'Ressource {ressource.nom} modifiée.')
+            return redirect('ressource_liste')
+        else:
+            messages.error(request, 'Erreur dans le formulaire.')
+    else:
+        form = RessourceForm(instance=ressource)
+
+    return render(request, 'notes_app/ressource_form.html', {
+        'form': form,
+        'ressource': ressource,
+        'titre_page': f'Modifier {ressource.nom}',
+        'action': 'Modifier',
+    })
+
+
+def ressource_supprimer(request, pk):
+    """Supprime une ressource après confirmation."""
+    ressource = get_object_or_404(Ressource, pk=pk)
+
+    if request.method == 'POST':
+        nom = ressource.nom
+        ressource.delete()
+        messages.success(request, f'Ressource {nom} supprimée.')
+        return redirect('ressource_liste')
+
+    return render(request, 'notes_app/ressource_confirm_delete.html', {
+        'ressource': ressource,
+        'titre_page': 'Supprimer une ressource',
+    })
+
+
+# ══════════════════════════════════════════════════════
+#  CRUD – EXAMENS   (Personne 2)
+# ══════════════════════════════════════════════════════
+
+def examen_liste(request):
+    """Affiche la liste de tous les examens."""
+    examens = Examen.objects.all()
+    return render(request, 'notes_app/examen_liste.html', {
+        'examens': examens,
+        'titre_page': 'Examens',
+    })
+
+
+def examen_detail(request, pk):
+    """Affiche le détail d'un examen."""
+    examen = get_object_or_404(Examen, pk=pk)
+    return render(request, 'notes_app/examen_detail.html', {
+        'examen': examen,
+        'titre_page': f'Examen – {examen.titre}',
+    })
+
+
+def examen_creer(request):
+    """Crée un nouvel examen."""
+    if request.method == 'POST':
+        form = ExamenForm(request.POST)
+        if form.is_valid():
+            examen = form.save()
+            messages.success(request, f'Examen {examen.titre} ajouté.')
+            return redirect('examen_liste')
+        else:
+            messages.error(request, 'Erreur dans le formulaire.')
+    else:
+        form = ExamenForm()
+
+    return render(request, 'notes_app/examen_form.html', {
+        'form': form,
+        'titre_page': 'Ajouter un examen',
+        'action': 'Ajouter',
+    })
+
+
+def examen_modifier(request, pk):
+    """Modifie un examen existant."""
+    examen = get_object_or_404(Examen, pk=pk)
+
+    if request.method == 'POST':
+        form = ExamenForm(request.POST, instance=examen)
+        if form.is_valid():
+            form.save()
+            messages.success(request, f'Examen {examen.titre} modifié.')
+            return redirect('examen_liste')
+        else:
+            messages.error(request, 'Erreur dans le formulaire.')
+    else:
+        form = ExamenForm(instance=examen)
+
+    return render(request, 'notes_app/examen_form.html', {
+        'form': form,
+        'examen': examen,
+        'titre_page': f'Modifier {examen.titre}',
+        'action': 'Modifier',
+    })
+
+
+def examen_supprimer(request, pk):
+    """Supprime un examen après confirmation."""
+    examen = get_object_or_404(Examen, pk=pk)
+
+    if request.method == 'POST':
+        titre = examen.titre
+        examen.delete()
+        messages.success(request, f'Examen {titre} supprimé.')
+        return redirect('examen_liste')
+
+    return render(request, 'notes_app/examen_confirm_delete.html', {
+        'examen': examen,
+        'titre_page': 'Supprimer un examen',
+    })
+
+
+# ══════════════════════════════════════════════════════
+#  CRUD – NOTES   (Personne 2)
+# ══════════════════════════════════════════════════════
+
+def note_liste(request):
+    """Affiche la liste de toutes les notes."""
+    notes = Note.objects.all()
+    return render(request, 'notes_app/note_liste.html', {
+        'notes': notes,
+        'titre_page': 'Notes',
+    })
+
+
+def note_creer(request):
+    """Crée une nouvelle note."""
+    if request.method == 'POST':
+        form = NoteForm(request.POST)
+        if form.is_valid():
+            form.save()
+            messages.success(request, 'Note ajoutée.')
+            return redirect('note_liste')
+        else:
+            messages.error(request, 'Erreur dans le formulaire.')
+    else:
+        form = NoteForm()
+
+    return render(request, 'notes_app/note_form.html', {
+        'form': form,
+        'titre_page': 'Ajouter une note',
+        'action': 'Ajouter',
+    })
+
+
+def note_modifier(request, pk):
+    """Modifie une note existante."""
+    note = get_object_or_404(Note, pk=pk)
+
+    if request.method == 'POST':
+        form = NoteForm(request.POST, instance=note)
+        if form.is_valid():
+            form.save()
+            messages.success(request, 'Note modifiée.')
+            return redirect('note_liste')
+        else:
+            messages.error(request, 'Erreur dans le formulaire.')
+    else:
+        form = NoteForm(instance=note)
+
+    return render(request, 'notes_app/note_form.html', {
+        'form': form,
+        'note': note,
+        'titre_page': 'Modifier la note',
+        'action': 'Modifier',
+    })
+
+
+def note_supprimer(request, pk):
+    """Supprime une note après confirmation."""
+    note = get_object_or_404(Note, pk=pk)
+
+    if request.method == 'POST':
+        note.delete()
+        messages.success(request, 'Note supprimée.')
+        return redirect('note_liste')
+
+    return render(request, 'notes_app/note_confirm_delete.html', {
+        'note': note,
+        'titre_page': 'Supprimer une note',
     })
