@@ -59,8 +59,15 @@ WSGI_APPLICATION = 'project_config.wsgi.application'
 # ──────────────────────────────────────────────
 DATABASES = {
     'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': BASE_DIR / 'db.sqlite3',
+        'ENGINE': 'django.db.backends.mysql',
+        'NAME': 'sae_notes',
+        'USER': 'ilkan',
+        'PASSWORD': 'ilkan',
+        'HOST': 'DESKTOP-F98HSOK',
+        'PORT': '3306',
+        'OPTIONS': {
+            'charset': 'utf8mb4',
+        },
     }
 }
 AUTH_PASSWORD_VALIDATORS = [
