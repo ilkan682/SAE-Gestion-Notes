@@ -1,0 +1,27 @@
+{% extends 'notes_app/base.html' %}
+
+{% block titre %}Tableau de bord{% endblock %}
+{% block titre_page %}Tableau de bord{% endblock %}
+
+{% block content %}
+<div class="stats-grid">
+  <div class="stat-card">
+    <p class="stat-label">Étudiants</p>
+    <p class="stat-value">{{ nb_etudiants }}</p>
+  </div>
+  <div class="stat-card">
+    <p class="stat-label">Enseignants</p>
+    <p class="stat-value">{{ nb_enseignants }}</p>
+  </div>
+  <div class="stat-card">
+    <p class="stat-label">UE</p>
+    <p class="stat-value">{{ nb_ue }}</p>
+  </div>
+</div>
+
+<div class="card" style="margin-top:1.5rem">
+  <div class="card-body">
+    <p>Bienvenue sur le gestionnaire de notes. Utilisez le menu à gauche pour naviguer.</p>
+  </div>
+</div>
+{% endblock %}

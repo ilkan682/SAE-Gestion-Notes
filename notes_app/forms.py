@@ -4,7 +4,7 @@ Responsable : Personne 1 (Ilkan) – branche dev-ilkan
 """
 
 from django import forms
-from .models import Etudiant, Enseignant, UE
+from .models import Etudiant, Enseignant, UE, Ressource, Examen, Note
 
 
 class EtudiantForm(forms.ModelForm):
@@ -101,3 +101,30 @@ class RessourceForm(forms.ModelForm):
             'coefficient':    forms.NumberInput(attrs={'class': 'form-control'}),
             'ue':             forms.Select(attrs={'class': 'form-select'}),
         }
+class ExamenForm(forms.ModelForm):
+    class Meta:
+        model = Examen
+        fields = ['titre', 'date', 'coefficient']
+        widgets = {
+            'date': forms.DateInput(attrs={'type': 'date'}),
+        }
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        for field in self.fields.values():
+            widget = field.widget
+            css = 'form-select' if hasattr(widget, 'choices') else 'form-control'
+            widget.attrs['class'] = css
+
+
+class NoteForm(forms.ModelForm):
+    class Meta:
+        model = Note
+        fields = ['examen', 'etudiant', 'note', 'appreciation']
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        for field in self.fields.values():
+            widget = field.widget
+            css = 'form-select' if hasattr(widget, 'choices') else 'form-control'
+            widget.attrs['class'] = css
