@@ -104,7 +104,7 @@ class RessourceForm(forms.ModelForm):
 class ExamenForm(forms.ModelForm):
     class Meta:
         model = Examen
-        fields = ['titre', 'date', 'coefficient']
+        fields = ['titre', 'date', 'coefficient', 'ressource']
         widgets = {
             'date': forms.DateInput(attrs={'type': 'date'}),
         }
