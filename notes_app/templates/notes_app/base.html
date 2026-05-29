@@ -422,7 +422,6 @@
     <a href="{% url 'accueil' %}" class="logo">
       <span>SAÉ</span> GestionNotes
     </a>
-    <p class="subtitle">IUT – BUT Informatique</p>
   </div>
 
   <nav class="nav-section">
@@ -443,9 +442,9 @@
       <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="7" width="20" height="14" rx="2"/><path d="M16 3H8a2 2 0 0 0-2 2v2h12V5a2 2 0 0 0-2-2z"/></svg>
       Enseignants
     </a>
-    <a href="{% url 'ue_liste' %}" class="nav-link {% if 'ue' in request.resolver_match.url_name %}active{% endif %}">
-      <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"/><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"/></svg>
-      UE
+    <a href="{% url 'ue_liste' %}" class="nav-link {% if request.resolver_match.url_name|slice:':3' == 'ue_' %}active{% endif %}">
+    <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"/><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"/></svg>
+    UE
     </a>
   </nav>
 
@@ -480,8 +479,7 @@
   </nav>
 
   <div class="sidebar-footer">
-    Branche : <strong style="color:rgba(255,255,255,.5)">dev-ilkan</strong><br>
-    Django + MySQL · XAMPP
+    Django + MySQL · Nginx
   </div>
 </aside>
 
