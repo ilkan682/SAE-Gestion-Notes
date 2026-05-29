@@ -1,0 +1,71 @@
+{% extends 'notes_app/base.html' %}
+
+{% block titre %}Étudiants{% endblock %}
+{% block titre_page %}Étudiants{% endblock %}
+{% block breadcrumb %}<span>/</span> <span>Étudiants</span>{% endblock %}
+
+{% block topbar_actions %}
+<form method="get" class="search-bar">
+  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+  <input type="search" name="q" value="{{ query }}" placeholder="Rechercher (nom, prénom, n°, groupe)...">
+</form>
+<a href="{% url 'etudiant_creer' %}" class="btn btn-primary">
+  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+  Ajouter
+</a>
+{% endblock %}
+
+{% block content %}
+<div class="card">
+  <div class="card-header">
+    <h2 class="card-title">Liste des étudiants</h2>
+  </div>
+
+  {% if etudiants %}
+  <div class="table-wrapper">
+    <table>
+      <thead>
+        <tr>
+          <th>Étudiant</th>
+          <th>N° étudiant</th>
+          <th>Groupe</th>
+          <th>Email</th>
+          <th>Actions</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for etudiant in etudiants %}
+        <tr>
+          <td>
+            <div class="cell-etudiant">
+              {% if etudiant.photo %}
+                <img src="{{ etudiant.photo.url }}" alt="" class="avatar" style="object-fit:cover">
+              {% else %}
+                <div class="avatar">{{ etudiant.get_initiales }}</div>
+              {% endif %}
+              <div>{{ etudiant.prenom }} {{ etudiant.nom }}</div>
+            </div>
+          </td>
+          <td><span class="cell-num">{{ etudiant.numero_etudiant }}</span></td>
+          <td><span class="badge badge-bleu">{{ etudiant.groupe }}</span></td>
+          <td>{{ etudiant.email }}</td>
+          <td>
+            <div style="display:flex;gap:.4rem">
+              <a href="{% url 'etudiant_detail' etudiant.pk %}" class="btn btn-outline btn-sm">Voir</a>
+              <a href="{% url 'etudiant_modifier' etudiant.pk %}" class="btn btn-outline btn-sm">Modifier</a>
+              <a href="{% url 'etudiant_supprimer' etudiant.pk %}" class="btn btn-danger btn-sm">Supprimer</a>
+            </div>
+          </td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+  {% else %}
+  <div class="empty-state">
+    <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/></svg>
+    <p>{% if query %}Aucun résultat pour "{{ query }}".{% else %}Aucun étudiant enregistré.{% endif %}</p>
+  </div>
+  {% endif %}
+</div>
+{% endblock %}

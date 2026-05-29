@@ -1,0 +1,80 @@
+{% extends 'notes_app/base.html' %}
+
+{% block titre %}{{ ue.code_ue }}{% endblock %}
+{% block titre_page %}Détail de l'UE{% endblock %}
+{% block breadcrumb %}
+  <span>/</span> <a href="{% url 'ue_liste' %}">UE</a>
+  <span>/</span> <span>{{ ue.code_ue }}</span>
+{% endblock %}
+
+{% block topbar_actions %}
+<a href="{% url 'ue_modifier' ue.pk %}" class="btn btn-outline">Modifier</a>
+<a href="{% url 'ue_supprimer' ue.pk %}" class="btn btn-danger">Supprimer</a>
+{% endblock %}
+
+{% block content %}
+<div class="card" style="margin-bottom:1.5rem">
+  <div class="card-header">
+    <h2 class="card-title">{{ ue.nom }}</h2>
+    <span class="badge badge-bleu">{{ ue.code_ue }}</span>
+  </div>
+  <div class="card-body">
+    <div class="detail-grid">
+      <div class="detail-item">
+        <label>Code UE</label>
+        <p>{{ ue.code_ue }}</p>
+      </div>
+      <div class="detail-item">
+        <label>Nom</label>
+        <p>{{ ue.nom }}</p>
+      </div>
+      <div class="detail-item">
+        <label>Semestre</label>
+        <p>{{ ue.get_semestre_display }}</p>
+      </div>
+      <div class="detail-item">
+        <label>Crédits ECTS</label>
+        <p>{{ ue.credits_ects }}</p>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="card">
+  <div class="card-header">
+    <h2 class="card-title">Ressources associées</h2>
+    <span class="badge badge-gris">{{ ressources|length }}</span>
+  </div>
+
+  {% if ressources %}
+  <div class="table-wrapper">
+    <table>
+      <thead>
+        <tr>
+          <th>Code</th>
+          <th>Nom</th>
+          <th>Coefficient</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for ressource in ressources %}
+        <tr>
+          <td><span class="cell-num">{{ ressource.code_ressource }}</span></td>
+          <td><a href="{% url 'ressource_detail' ressource.pk %}" style="color:var(--bleu-clair);text-decoration:none">{{ ressource.nom }}</a></td>
+          <td>{{ ressource.coefficient }}</td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+  {% else %}
+  <div class="empty-state">
+    <p>Aucune ressource associée à cette UE.</p>
+  </div>
+  {% endif %}
+</div>
+
+<div style="margin-top:1.5rem">
+  <a href="{% url 'ue_liste' %}" class="btn btn-outline">Retour à la liste</a>
+</div>
+{% endblock %}

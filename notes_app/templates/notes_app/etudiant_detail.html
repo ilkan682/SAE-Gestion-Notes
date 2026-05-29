@@ -1,0 +1,58 @@
+{% extends 'notes_app/base.html' %}
+
+{% block titre %}{{ etudiant.prenom }} {{ etudiant.nom }}{% endblock %}
+{% block titre_page %}Détail de l'étudiant{% endblock %}
+{% block breadcrumb %}
+  <span>/</span> <a href="{% url 'etudiant_liste' %}">Étudiants</a>
+  <span>/</span> <span>{{ etudiant.prenom }} {{ etudiant.nom }}</span>
+{% endblock %}
+
+{% block topbar_actions %}
+<a href="{% url 'etudiant_modifier' etudiant.pk %}" class="btn btn-outline">Modifier</a>
+<a href="{% url 'etudiant_supprimer' etudiant.pk %}" class="btn btn-danger">Supprimer</a>
+{% endblock %}
+
+{% block content %}
+<div class="card">
+  <div class="card-body">
+    <div style="display:flex;gap:1.5rem;align-items:center;margin-bottom:1.5rem">
+      {% if etudiant.photo %}
+        <img src="{{ etudiant.photo.url }}" class="photo-preview" alt="">
+      {% else %}
+        <div class="avatar" style="width:80px;height:80px;font-size:1.5rem">{{ etudiant.get_initiales }}</div>
+      {% endif %}
+      <div>
+        <h2 style="font-size:1.4rem;font-weight:600">{{ etudiant.prenom }} {{ etudiant.nom }}</h2>
+        <p style="color:var(--gris-5);font-family:var(--font-mono);font-size:.85rem">{{ etudiant.numero_etudiant }}</p>
+      </div>
+    </div>
+
+    <div class="detail-grid">
+      <div class="detail-item">
+        <label>N° étudiant</label>
+        <p>{{ etudiant.numero_etudiant }}</p>
+      </div>
+      <div class="detail-item">
+        <label>Groupe</label>
+        <p>{{ etudiant.groupe }}</p>
+      </div>
+      <div class="detail-item">
+        <label>Nom</label>
+        <p>{{ etudiant.nom }}</p>
+      </div>
+      <div class="detail-item">
+        <label>Prénom</label>
+        <p>{{ etudiant.prenom }}</p>
+      </div>
+      <div class="detail-item" style="grid-column:1 / -1">
+        <label>Email</label>
+        <p>{{ etudiant.email }}</p>
+      </div>
+    </div>
+
+    <div style="margin-top:1.5rem">
+      <a href="{% url 'etudiant_liste' %}" class="btn btn-outline">Retour à la liste</a>
+    </div>
+  </div>
+</div>
+{% endblock %}

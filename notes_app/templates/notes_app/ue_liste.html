@@ -1,0 +1,75 @@
+{% extends 'notes_app/base.html' %}
+
+{% block titre %}UE{% endblock %}
+{% block titre_page %}Unités d'Enseignement{% endblock %}
+{% block breadcrumb %}<span>/</span> <span>UE</span>{% endblock %}
+
+{% block topbar_actions %}
+<form method="get" class="search-bar">
+  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+  <input type="search" name="q" value="{{ query }}" placeholder="Rechercher (code, nom)...">
+</form>
+<a href="{% url 'ue_creer' %}" class="btn btn-primary">
+  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+  Ajouter
+</a>
+{% endblock %}
+
+{% block content %}
+<div class="card" style="margin-bottom:1rem">
+  <div class="card-body" style="padding:1rem 1.5rem">
+    <form method="get" style="display:flex;gap:.5rem;align-items:center;flex-wrap:wrap">
+      <input type="hidden" name="q" value="{{ query }}">
+      <label style="margin:0;font-size:.85rem">Filtrer par semestre :</label>
+      <a href="?q={{ query }}" class="btn btn-outline btn-sm {% if not semestre_actif %}btn-primary{% endif %}">Tous</a>
+      {% for code, label in semestres %}
+        <a href="?q={{ query }}&semestre={{ code }}" class="btn btn-outline btn-sm {% if semestre_actif == code %}btn-primary{% endif %}">{{ code }}</a>
+      {% endfor %}
+    </form>
+  </div>
+</div>
+
+<div class="card">
+  <div class="card-header">
+    <h2 class="card-title">Liste des UE</h2>
+  </div>
+
+  {% if ues %}
+  <div class="table-wrapper">
+    <table>
+      <thead>
+        <tr>
+          <th>Code</th>
+          <th>Nom</th>
+          <th>Semestre</th>
+          <th>Crédits ECTS</th>
+          <th>Actions</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for ue in ues %}
+        <tr>
+          <td><span class="cell-num">{{ ue.code_ue }}</span></td>
+          <td>{{ ue.nom }}</td>
+          <td><span class="badge badge-bleu">{{ ue.get_semestre_display }}</span></td>
+          <td><span class="badge badge-gris">{{ ue.credits_ects }}</span></td>
+          <td>
+            <div style="display:flex;gap:.4rem">
+              <a href="{% url 'ue_detail' ue.pk %}" class="btn btn-outline btn-sm">Voir</a>
+              <a href="{% url 'ue_modifier' ue.pk %}" class="btn btn-outline btn-sm">Modifier</a>
+              <a href="{% url 'ue_supprimer' ue.pk %}" class="btn btn-danger btn-sm">Supprimer</a>
+            </div>
+          </td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+  {% else %}
+  <div class="empty-state">
+    <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"/><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"/></svg>
+    <p>{% if query or semestre_actif %}Aucun résultat.{% else %}Aucune UE enregistrée.{% endif %}</p>
+  </div>
+  {% endif %}
+</div>
+{% endblock %}

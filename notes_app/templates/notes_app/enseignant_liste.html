@@ -1,0 +1,57 @@
+{% extends 'notes_app/base.html' %}
+
+{% block titre %}Enseignants{% endblock %}
+{% block titre_page %}Enseignants{% endblock %}
+{% block breadcrumb %}<span>/</span> <span>Enseignants</span>{% endblock %}
+
+{% block topbar_actions %}
+<form method="get" class="search-bar">
+  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+  <input type="search" name="q" value="{{ query }}" placeholder="Rechercher (nom, prénom)...">
+</form>
+<a href="{% url 'enseignant_creer' %}" class="btn btn-primary">
+  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+  Ajouter
+</a>
+{% endblock %}
+
+{% block content %}
+<div class="card">
+  <div class="card-header">
+    <h2 class="card-title">Liste des enseignants</h2>
+  </div>
+
+  {% if enseignants %}
+  <div class="table-wrapper">
+    <table>
+      <thead>
+        <tr>
+          <th>Nom</th>
+          <th>Prénom</th>
+          <th>Actions</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for enseignant in enseignants %}
+        <tr>
+          <td>{{ enseignant.nom }}</td>
+          <td>{{ enseignant.prenom }}</td>
+          <td>
+            <div style="display:flex;gap:.4rem">
+              <a href="{% url 'enseignant_modifier' enseignant.pk %}" class="btn btn-outline btn-sm">Modifier</a>
+              <a href="{% url 'enseignant_supprimer' enseignant.pk %}" class="btn btn-danger btn-sm">Supprimer</a>
+            </div>
+          </td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+  {% else %}
+  <div class="empty-state">
+    <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="2" y="7" width="20" height="14" rx="2"/><path d="M16 3H8a2 2 0 0 0-2 2v2h12V5a2 2 0 0 0-2-2z"/></svg>
+    <p>{% if query %}Aucun résultat pour "{{ query }}".{% else %}Aucun enseignant enregistré.{% endif %}</p>
+  </div>
+  {% endif %}
+</div>
+{% endblock %}
