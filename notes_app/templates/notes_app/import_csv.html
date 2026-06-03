@@ -1,0 +1,54 @@
+{% extends "notes_app/base.html" %}
+
+{% block content %}
+<div class="container mt-4">
+
+  <h2>Import des notes par CSV</h2>
+
+  <div class="alert alert-info">
+    <strong>Format attendu du fichier CSV :</strong><br>
+    La première ligne doit contenir exactement cet en-tête :<br><br>
+    <code>numero_etudiant,id_examen,note,appreciation</code><br><br>
+
+    <strong>Exemple :</strong>
+    <pre>numero_etudiant,id_examen,note,appreciation
+20240001,1,15.5,Bien
+20240002,1,12.0,Assez bien
+20240003,1,8.5,Insuffisant</pre>
+
+    <ul class="mb-0">
+      <li><code>numero_etudiant</code> : le N° étudiant tel qu'il est en base</li>
+      <li><code>id_examen</code> : l'ID numérique de l'examen</li>
+      <li><code>note</code> : nombre entre 0 et 20 (ex: 15.5)</li>
+      <li><code>appreciation</code> : texte libre, peut être vide</li>
+    </ul>
+  </div>
+
+  <form method="post" enctype="multipart/form-data" class="mb-4">
+    {% csrf_token %}
+    <div class="mb-3">
+      <label class="form-label">Sélectionner le fichier CSV</label>
+      <input type="file" name="csv_file" accept=".csv" class="form-control" required>
+    </div>
+    <button type="submit" class="btn btn-primary">Importer les notes</button>
+  </form>
+
+  {% if success %}
+    <div class="alert alert-success">
+      ✅ {{ success }} note(s) importée(s) avec succès.
+    </div>
+  {% endif %}
+
+  {% if errors %}
+    <div class="alert alert-warning">
+      <strong>⚠️ {{ errors|length }} erreur(s) :</strong>
+      <ul class="mb-0">
+        {% for e in errors %}
+          <li>{{ e }}</li>
+        {% endfor %}
+      </ul>
+    </div>
+  {% endif %}
+
+</div>
+{% endblock %}
