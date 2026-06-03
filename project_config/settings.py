@@ -60,10 +60,10 @@ WSGI_APPLICATION = 'project_config.wsgi.application'
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.mysql',
-        'NAME': 'sae_notes',
+        'NAME': 'gestion-notes',
         'USER': 'ilkan',
-        'PASSWORD': 'ilkan',
-        'HOST': 'DESKTOP-F98HSOK',
+        'PASSWORD': 'toto',
+        'HOST': 'serveur-notes',
         'PORT': '3306',
         'OPTIONS': {
             'charset': 'utf8mb4',
