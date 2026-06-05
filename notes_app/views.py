@@ -532,3 +532,59 @@ def note_supprimer(request, pk):
         'note': note,
         'titre_page': 'Supprimer une note',
     })
+# ══════════════════════════════════════════════════════
+#  IMPORT CSV — NOTES   (Personne 3 - Rafael)
+# ══════════════════════════════════════════════════════
+
+import csv
+import io
+
+def import_csv(request):
+    errors = []
+    success = 0
+
+    if request.method == 'POST' and request.FILES.get('csv_file'):
+        csv_file = request.FILES['csv_file']
+
+        if not csv_file.name.endswith('.csv'):
+            errors.append("Le fichier doit être au format .csv")
+        else:
+            data = csv_file.read().decode('utf-8')
+            reader = csv.DictReader(io.StringIO(data))
+
+            for i, row in enumerate(reader, start=2):
+                try:
+                    etudiant = Etudiant.objects.get(
+                        numero_etudiant=row['numero_etudiant'].strip()
+                    )
+                    examen = Examen.objects.get(
+                        id_examen=int(row['id_examen'].strip())
+                    )
+                    note_val = float(row['note'].strip())
+
+                    if not (0 <= note_val <= 20):
+                        errors.append(f"Ligne {i} : note hors plage 0-20")
+                        continue
+
+                    Note.objects.update_or_create(
+                        etudiant=etudiant,
+                        examen=examen,
+                        defaults={
+                            'note': note_val,
+                            'appreciation': row.get('appreciation', '').strip()
+                        }
+                    )
+                    success += 1
+
+                except Etudiant.DoesNotExist:
+                    errors.append(f"Ligne {i} : étudiant '{row.get('numero_etudiant')}' introuvable")
+                except Examen.DoesNotExist:
+                    errors.append(f"Ligne {i} : examen ID '{row.get('id_examen')}' introuvable")
+                except (ValueError, KeyError) as e:
+                    errors.append(f"Ligne {i} : erreur de format → {e}")
+
+    return render(request, 'notes_app/import_csv.html', {
+        'errors': errors,
+        'success': success if success else None,
+        'titre_page': 'Import CSV',
+    })
