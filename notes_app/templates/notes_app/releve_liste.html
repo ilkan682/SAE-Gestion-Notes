@@ -1,0 +1,39 @@
+{% extends "notes_app/base.html" %}
+
+{% block content %}
+<div class="container mt-4">
+
+  <h2>Relevé de notes — choisir un étudiant</h2>
+
+  <form method="get" class="mb-3">
+    <input type="text" name="q" value="{{ query }}"
+           placeholder="Rechercher un étudiant..." class="form-control">
+  </form>
+
+  <table border="1" cellpadding="8" cellspacing="0" style="border-collapse:collapse; width:100%;">
+    <thead>
+      <tr>
+        <th>N° étudiant</th>
+        <th>Nom</th>
+        <th>Prénom</th>
+        <th>Groupe</th>
+        <th>Relevé</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for e in etudiants %}
+      <tr>
+        <td>{{ e.numero_etudiant }}</td>
+        <td>{{ e.nom }}</td>
+        <td>{{ e.prenom }}</td>
+        <td>{{ e.groupe }}</td>
+        <td><a href="{% url 'releve_etudiant' e.numero_etudiant %}">Voir le relevé</a></td>
+      </tr>
+      {% empty %}
+      <tr><td colspan="5">Aucun étudiant trouvé.</td></tr>
+      {% endfor %}
+    </tbody>
+  </table>
+
+</div>
+{% endblock %}

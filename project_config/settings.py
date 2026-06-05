@@ -59,8 +59,12 @@ WSGI_APPLICATION = 'project_config.wsgi.application'
 # ──────────────────────────────────────────────
 DATABASES = {
     'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': BASE_DIR / 'db.sqlite3',
+        'ENGINE': 'django.db.backends.mysql',
+        'NAME': 'gestion-notes',
+        'USER': 'ilkan',          # Tu peux aussi tester avec 'rafael' ou 'hussain'
+        'PASSWORD': 'toto',       # Le mot de passe unique qu'on a configuré
+        'HOST': 'serveur-notes',  # Le nom de ta VM (si ça bloque, mets directement l'IP de ta VM à la place)
+        'PORT': '3306',
     }
 }
 AUTH_PASSWORD_VALIDATORS = [

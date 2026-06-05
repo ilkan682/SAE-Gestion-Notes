@@ -17,6 +17,7 @@ urlpatterns = [
     path('', include('notes_app.urls_examens')),
     path('', include('notes_app.urls_notes')),
     path('import/', include('notes_app.urls_import')),
+    path('releve/', include('notes_app.urls_releve')),
     # Les URL des autres branches seront ajoutées ici lors de la fusion
     # path('ressources/', include('notes_app.urls_ressources')),   # dev-hussain
     # path('examens/', include('notes_app.urls_examens')),         # dev-hussain
