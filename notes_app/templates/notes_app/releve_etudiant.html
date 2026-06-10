@@ -1,0 +1,63 @@
+{% extends "notes_app/base.html" %}
+
+{% block content %}
+<div class="container mt-4">
+
+  <div style="display:flex; justify-content:space-between; align-items:center;">
+    <h2>Relevé de notes</h2>
+    <button onclick="window.print()" class="btn btn-secondary">Imprimer</button>
+  </div>
+
+  {# En-tête identité de l'étudiant #}
+  <div class="alert alert-info">
+    <strong>{{ etudiant.prenom }} {{ etudiant.nom }}</strong><br>
+    N° étudiant : {{ etudiant.numero_etudiant }}<br>
+    Groupe : {{ etudiant.groupe }}<br>
+    Email : {{ etudiant.email }}
+  </div>
+
+  {# Pour chaque UE de l'étudiant #}
+  {% for bloc in releve %}
+  <h3>{{ bloc.ue.code_ue }} — {{ bloc.ue.nom }}
+      <small>({{ bloc.ue.get_semestre_display }}, {{ bloc.ue.credits_ects }} ECTS)</small>
+  </h3>
+
+  <table border="1" cellpadding="8" cellspacing="0"
+         style="border-collapse:collapse; width:100%; margin-bottom:10px;">
+    <thead>
+      <tr>
+        <th>Ressource</th>
+        <th>Examen</th>
+        <th>Note /20</th>
+        <th>Appréciation</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for r in bloc.ressources %}
+        {% for note in r.notes %}
+        <tr>
+          <td>{{ r.ressource.code_ressource }} — {{ r.ressource.nom }}</td>
+          <td>{{ note.examen.titre }}</td>
+          <td>{{ note.note }}</td>
+          <td>{{ note.appreciation }}</td>
+        </tr>
+        {% endfor %}
+        <tr style="background:#f0f0f0;">
+          <td colspan="2"><em>Moyenne {{ r.ressource.code_ressource }}</em></td>
+          <td colspan="2"><strong>{{ r.moyenne }} /20</strong></td>
+        </tr>
+      {% endfor %}
+      <tr style="background:#dde7ff;">
+        <td colspan="2"><strong>Moyenne {{ bloc.ue.code_ue }}</strong></td>
+        <td colspan="2"><strong>{{ bloc.moyenne }} /20</strong></td>
+      </tr>
+    </tbody>
+  </table>
+  {% empty %}
+  <div class="alert alert-warning">
+    Cet étudiant n'a aucune note enregistrée pour le moment.
+  </div>
+  {% endfor %}
+
+</div>
+{% endblock %}

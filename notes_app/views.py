@@ -588,3 +588,110 @@ def import_csv(request):
         'success': success if success else None,
         'titre_page': 'Import CSV',
     })
+
+# ══════════════════════════════════════════════════════
+#  RELEVÉ DE NOTES   (Personne 3 - Rafael)
+# ══════════════════════════════════════════════════════
+
+def releve_liste(request):
+    """
+    Vue qui affiche la liste de tous les étudiants
+    pour pouvoir choisir lequel afficher le relevé.
+    Inclut une barre de recherche par nom/prénom/numéro.
+    """
+    # On récupère ce qui a été tapé dans la barre de recherche (paramètre GET nommé 'q')
+    # Si rien n'a été tapé, query vaut '' (chaîne vide)
+    query = request.GET.get('q', '')
+
+    # On part de tous les étudiants
+    etudiants = Etudiant.objects.all()
+
+    # Si l'utilisateur a tapé quelque chose dans la recherche,
+    # on filtre les étudiants dont le nom, prénom ou numéro contient ce texte
+    # Q(...) | Q(...) permet de faire un OU logique entre plusieurs critères
+    # __icontains = contient (insensible à la casse, ex: "ros" trouve "ROSSI")
+    if query:
+        etudiants = etudiants.filter(
+            Q(nom__icontains=query) |
+            Q(prenom__icontains=query) |
+            Q(numero_etudiant__icontains=query)
+        )
+
+    # On envoie au template la liste des étudiants et la recherche en cours
+    return render(request, 'notes_app/releve_liste.html', {
+        'etudiants': etudiants,
+        'query': query,
+        'titre_page': 'Relevé de notes',
+    })
+
+
+def releve_etudiant(request, pk):
+    """
+    Vue qui génère le relevé complet d'un étudiant donné.
+    pk = numéro étudiant passé dans l'URL (ex: /releve/6767/)
+    Organise les notes par UE > Ressource et calcule les moyennes.
+    """
+    # On cherche l'étudiant avec ce numéro. Si introuvable, erreur 404 automatique
+    etudiant = get_object_or_404(Etudiant, pk=pk)
+
+    # On récupère TOUTES les notes de cet étudiant
+    # select_related : optimisation Django qui charge en UNE SEULE requête SQL
+    # l'examen, sa ressource, et l'UE de la ressource (au lieu d'en refaire à chaque accès)
+    notes = Note.objects.filter(etudiant=etudiant).select_related(
+        'examen', 'examen__ressource', 'examen__ressource__ue'
+    )
+
+    # ── ORGANISATION DES DONNÉES ──
+    # On veut une structure du type : { UE: { Ressource: [liste de notes] } }
+    # Cela permet de regrouper visuellement les notes par matière et par UE
+    organisation = {}
+    for note in notes:
+        # On remonte la chaîne : note → examen → ressource → UE
+        ressource = note.examen.ressource
+        ue = ressource.ue
+
+        # setdefault crée la clé si elle n'existe pas encore
+        # Sinon on ajoute la note dans la liste existante
+        organisation.setdefault(ue, {}).setdefault(ressource, []).append(note)
+
+    # ── CALCUL DES MOYENNES ──
+    # On construit la liste finale "releve" qui sera affichée dans le template
+    releve = []
+    for ue, ressources in organisation.items():
+        # Pour chaque UE, on prépare un dictionnaire avec ses infos
+        ue_data = {'ue': ue, 'ressources': [], 'moyenne': None}
+
+        # Variables pour calculer la moyenne globale de l'UE
+        somme_ue = 0   # Somme des (moyenne_ressource × coef_ressource)
+        coef_ue = 0    # Somme des coefficients des ressources
+
+        for ressource, liste_notes in ressources.items():
+            # ── Moyenne d'une RESSOURCE ──
+            # Moyenne pondérée des examens : Σ(note × coef_examen) / Σ(coef_examen)
+            somme = sum(float(n.note) * float(n.examen.coefficient) for n in liste_notes)
+            coef = sum(float(n.examen.coefficient) for n in liste_notes)
+            # Si pas de coefficient (impossible normalement), on met 0 pour éviter division par zéro
+            moy_ressource = round(somme / coef, 2) if coef else 0
+
+            # On ajoute les infos de cette ressource au bloc UE
+            ue_data['ressources'].append({
+                'ressource': ressource,
+                'notes': liste_notes,
+                'moyenne': moy_ressource,
+            })
+
+            # ── Accumulation pour la moyenne de l'UE ──
+            # On pondère la moyenne de la ressource par son propre coefficient
+            somme_ue += moy_ressource * float(ressource.coefficient)
+            coef_ue += float(ressource.coefficient)
+
+        # ── Moyenne globale de l'UE ──
+        ue_data['moyenne'] = round(somme_ue / coef_ue, 2) if coef_ue else 0
+        releve.append(ue_data)
+
+    # On envoie au template l'étudiant et son relevé organisé
+    return render(request, 'notes_app/releve_etudiant.html', {
+        'etudiant': etudiant,
+        'releve': releve,
+        'titre_page': f'Relevé – {etudiant.prenom} {etudiant.nom}',
+    })
