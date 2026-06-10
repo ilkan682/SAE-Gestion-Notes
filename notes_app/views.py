@@ -15,12 +15,12 @@ from .forms import EtudiantForm, EnseignantForm, UEForm,RessourceForm, ExamenFor
 # ──────────────────────────────────────────────
 
 def accueil(request):
-    """Tableau de bord principal avec statistiques."""
     context = {
-        'nb_etudiants': Etudiant.objects.count(),
+        'nb_etudiants':   Etudiant.objects.count(),
         'nb_enseignants': Enseignant.objects.count(),
-        'nb_ue': UE.objects.count(),
-        'titre_page': 'Tableau de bord',
+        'nb_ue':          UE.objects.count(),
+        'nb_examens':     Examen.objects.count(),          # powers the 4th card
+        'derniers_etudiants': Etudiant.objects.order_by('-pk')[:5],
     }
     return render(request, 'notes_app/accueil.html', context)
 
