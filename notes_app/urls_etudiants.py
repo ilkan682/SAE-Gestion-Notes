@@ -1,4 +1,4 @@
-"""URLs – Étudiants"""
+
 from django.urls import path
 from . import views
 
