@@ -1,7 +1,4 @@
-"""
-Django settings for SAÉ – Gestion des Notes Étudiantes
-Branche: dev-ilkan | Personne 1
-"""
+
 
 from pathlib import Path
 
