@@ -50,10 +50,7 @@ TEMPLATES = [
 
 WSGI_APPLICATION = 'project_config.wsgi.application'
 
-# ──────────────────────────────────────────────
-#  BASE DE DONNÉES MySQL via XAMPP
-#  Démarrer MySQL dans XAMPP avant de lancer Django
-# ──────────────────────────────────────────────
+
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.mysql',
